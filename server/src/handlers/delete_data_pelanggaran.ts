@@ -1,6 +1,16 @@
 
+import { db } from '../db';
+import { dataPelanggaranTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
 export async function deleteDataPelanggaran(id: number): Promise<void> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting a violation type from the database by ID.
-    return Promise.resolve();
+  try {
+    // Delete violation type record
+    await db.delete(dataPelanggaranTable)
+      .where(eq(dataPelanggaranTable.id, id))
+      .execute();
+  } catch (error) {
+    console.error('Data pelanggaran deletion failed:', error);
+    throw error;
+  }
 }

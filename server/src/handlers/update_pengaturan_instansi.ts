@@ -1,19 +1,47 @@
 
+import { db } from '../db';
+import { pengaturanInstansiTable } from '../db/schema';
 import { type UpdatePengaturanInstansiInput, type PengaturanInstansi } from '../schema';
+import { eq } from 'drizzle-orm';
 
-export async function updatePengaturanInstansi(input: UpdatePengaturanInstansiInput): Promise<PengaturanInstansi> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is updating institution settings in the database.
-    // Should create a new record if none exists, otherwise update the existing one.
-    return Promise.resolve({
-        id: 1,
-        nama_instansi: input.nama_instansi || 'placeholder',
-        alamat: input.alamat || 'placeholder',
-        nama_kepala_sekolah: input.nama_kepala_sekolah || 'placeholder',
-        website: input.website || null,
-        email: input.email || null,
-        logo_sekolah: input.logo_sekolah || null,
-        created_at: new Date(),
-        updated_at: new Date()
-    } as PengaturanInstansi);
-}
+export const updatePengaturanInstansi = async (input: UpdatePengaturanInstansiInput): Promise<PengaturanInstansi> => {
+  try {
+    // Check if any settings record exists
+    const existing = await db.select()
+      .from(pengaturanInstansiTable)
+      .limit(1)
+      .execute();
+
+    if (existing.length === 0) {
+      // Create new record if none exists - all fields are required for creation
+      const result = await db.insert(pengaturanInstansiTable)
+        .values({
+          nama_instansi: input.nama_instansi || 'Default Institution',
+          alamat: input.alamat || 'Default Address',
+          nama_kepala_sekolah: input.nama_kepala_sekolah || 'Default Principal',
+          website: input.website || null,
+          email: input.email || null,
+          logo_sekolah: input.logo_sekolah || null
+        })
+        .returning()
+        .execute();
+
+      return result[0];
+    } else {
+      // Update existing record
+      const result = await db.update(pengaturanInstansiTable)
+        .set({
+          ...input,
+          updated_at: new Date()
+        })
+        .where(eq(pengaturanInstansiTable.id, existing[0].id))
+        .returning()
+        .execute();
+
+      return result[0];
+    }
+  } catch (error) {
+    console.error('Institution settings update failed:', error);
+    throw error;
+  }
+};

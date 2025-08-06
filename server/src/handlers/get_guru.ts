@@ -1,8 +1,17 @@
 
+import { db } from '../db';
+import { guruTable } from '../db/schema';
 import { type Guru } from '../schema';
 
-export async function getGuru(): Promise<Guru[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all teachers from the database.
-    return [];
-}
+export const getGuru = async (): Promise<Guru[]> => {
+  try {
+    const results = await db.select()
+      .from(guruTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch teachers:', error);
+    throw error;
+  }
+};

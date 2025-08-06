@@ -1,15 +1,24 @@
 
+import { db } from '../db';
+import { dataPelanggaranTable } from '../db/schema';
 import { type CreateDataPelanggaranInput, type DataPelanggaran } from '../schema';
 
-export async function createDataPelanggaran(input: CreateDataPelanggaranInput): Promise<DataPelanggaran> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new violation type and persisting it in the database.
-    return Promise.resolve({
-        id: 0, // Placeholder ID
+export const createDataPelanggaran = async (input: CreateDataPelanggaranInput): Promise<DataPelanggaran> => {
+  try {
+    // Insert data pelanggaran record
+    const result = await db.insert(dataPelanggaranTable)
+      .values({
         kategori: input.kategori,
         jenis_pelanggaran: input.jenis_pelanggaran,
-        poin: input.poin,
-        created_at: new Date(),
-        updated_at: null
-    } as DataPelanggaran);
-}
+        poin: input.poin
+      })
+      .returning()
+      .execute();
+
+    const dataPelanggaran = result[0];
+    return dataPelanggaran;
+  } catch (error) {
+    console.error('Data pelanggaran creation failed:', error);
+    throw error;
+  }
+};

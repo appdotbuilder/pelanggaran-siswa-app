@@ -1,6 +1,15 @@
 
-export async function deleteGuru(id: number): Promise<void> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting a teacher from the database by ID.
-    return Promise.resolve();
-}
+import { db } from '../db';
+import { guruTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
+export const deleteGuru = async (id: number): Promise<void> => {
+  try {
+    await db.delete(guruTable)
+      .where(eq(guruTable.id, id))
+      .execute();
+  } catch (error) {
+    console.error('Guru deletion failed:', error);
+    throw error;
+  }
+};

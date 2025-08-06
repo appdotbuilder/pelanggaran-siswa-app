@@ -1,6 +1,15 @@
 
-export async function deleteUser(id: number): Promise<void> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting a user from the database by ID.
-    return Promise.resolve();
-}
+import { db } from '../db';
+import { usersTable } from '../db/schema';
+import { eq } from 'drizzle-orm';
+
+export const deleteUser = async (id: number): Promise<void> => {
+  try {
+    await db.delete(usersTable)
+      .where(eq(usersTable.id, id))
+      .execute();
+  } catch (error) {
+    console.error('User deletion failed:', error);
+    throw error;
+  }
+};

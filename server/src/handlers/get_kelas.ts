@@ -1,8 +1,17 @@
 
+import { db } from '../db';
+import { kelasTable } from '../db/schema';
 import { type Kelas } from '../schema';
 
-export async function getKelas(): Promise<Kelas[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all classes from the database.
-    return [];
-}
+export const getKelas = async (): Promise<Kelas[]> => {
+  try {
+    const results = await db.select()
+      .from(kelasTable)
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get kelas:', error);
+    throw error;
+  }
+};
